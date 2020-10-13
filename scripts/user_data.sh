@@ -10,4 +10,9 @@ sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-
 sudo chmod +x /usr/local/bin/docker-compose
 
 #clone Ghost project
+cd /home
 git clone https://github.com/sionsmith/docker-compose-ghost-quickstart.git
+#update the production config with the correct name to sort out the links in the menu
+sed -i 's/yourdomain/${domain}/' docker-compose-ghost-quickstart/ghost/config.production.json
+cd docker-compose-ghost-quickstart
+docker-compose up --build -d

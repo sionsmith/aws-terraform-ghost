@@ -1,6 +1,6 @@
 resource "aws_launch_configuration" "ghost_server_launch_config" {
   name_prefix                 = "${upper(var.environment)}-GHOST-ASG-"
-  image_id                    = data.aws_ami.amazon_linux_2.image_id
+  image_id                    = data.aws_ami.ubuntu_1804.image_id
   instance_type               = var.ec2_instance_type
   iam_instance_profile        = aws_iam_instance_profile.ghost_profile.name
   security_groups             = [aws_security_group.ghost_sg.id]

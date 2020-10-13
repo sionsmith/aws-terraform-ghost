@@ -19,4 +19,5 @@ resource "aws_alb_listener" "https" {
 
   protocol        = "HTTPS"
   ssl_policy      = "ELBSecurityPolicy-FS-1-2-Res-2019-08"
+  certificate_arn = module.cert_ghost_alb.arn
 }

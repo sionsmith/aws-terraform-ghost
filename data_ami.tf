@@ -1,14 +1,21 @@
-data "aws_ami" "amazon_linux_2" {
+# identify ubuntu 18.04 ami
+data "aws_ami" "ubuntu_1804" {
   most_recent = true
 
   filter {
-    name   = "owner-alias"
-    values = ["amazon"]
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
   }
-  owners = ["amazon"]
 
   filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm*"]
+    name   = "architecture"
+    values = ["x86_64"]
   }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["099720109477"]
 }

@@ -57,7 +57,7 @@ resource "aws_iam_role_policy_attachment" "webserver_attach_kms" {
 
 resource "aws_iam_role_policy_attachment" "ssm-attach" {
   role       = aws_iam_role.webserver_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_iam_role_policy_attachment" "writetocloudwatch" {

@@ -68,6 +68,11 @@ variable "environment" {
   type = string
 }
 
+variable "domain" {
+  type = string
+  description = "Public Route53 domain which will be used in certificate generation."
+}
+
 variable "key_name" {
   type        = string
   description = "Set the EC2 Key name"

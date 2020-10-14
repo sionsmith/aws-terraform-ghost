@@ -1,11 +1,21 @@
 resource "aws_alb_listener" "http" {
+  load_balancer_arn = aws_alb.ghost.id
+  port              = 80
+  protocol          = "HTTP"
+
   default_action {
-    type             = "forward"
-    target_group_arn = aws_alb_target_group.http.arn
+    type = "redirect"
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
   }
 
-  load_balancer_arn = aws_alb.ghost.arn
-  port              = 80
+  depends_on = [
+    aws_alb.ghost,
+    aws_alb_target_group.http
+  ]
 }
 
 resource "aws_alb_listener" "https" {

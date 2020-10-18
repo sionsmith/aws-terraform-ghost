@@ -78,10 +78,28 @@ variable "key_name" {
   description = "Set the EC2 Key name"
 }
 
+variable "smtp_ses_password" {
+  type = string
+  default = ""
+}
+
+variable "smtp_ses_username" {
+  type = string
+  default = ""
+}
+
+variable "smtp_email_address" {
+  type = string
+  default = ""
+}
+
 variable "common_tags" {
   type = map(string)
 }
 
+locals {
+  ghost_resources_bucket_name = "ghost-resources-${data.aws_region.current.name}-${data.aws_caller_identity.current.account_id}"
+}
 
 
 

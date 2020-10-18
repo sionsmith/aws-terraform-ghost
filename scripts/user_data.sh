@@ -14,5 +14,14 @@ cd /home
 git clone https://github.com/sionsmith/docker-compose-ghost-quickstart.git
 #update the production config with the correct name to sort out the links in the menu
 sed -i 's/yourdomain/${domain}/' docker-compose-ghost-quickstart/ghost/config.production.json
+sed -i 's/CHANGE_USERNAME/${ses_username}/' docker-compose-ghost-quickstart/ghost/config.production.json
+sed -i 's/CHANGE_PASSWORD/${ses_password}/' docker-compose-ghost-quickstart/ghost/config.production.json
+sed -i 's/CHANGE_FROM_EMAIL/${ses_email}/' docker-compose-ghost-quickstart/ghost/config.production.json
+
 cd docker-compose-ghost-quickstart
 docker-compose up --build -d
+
+#copy any themes from s3 into the volume mapping
+sleep 15
+aws s3 cp ${ghost_resources_bucket}/themes/ ./ghost/content/themes/ --recursive
+unzip "./ghost/content/themes/*.zip"

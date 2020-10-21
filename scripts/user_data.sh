@@ -4,12 +4,23 @@ set +e
 #log output from this user_data script
 exec > >(tee /var/log/user-data.log|logger -t user-data ) 2>&1
 
-#install docker and docker-compose
+#create environment variables used in cron tasks.
+echo "#Creating environment variables used in cron tasks"
+echp "S3_BACKUP_BUCKET=s3://`${ghost_resources_bucket}`" >> /etc/environment
+
+echo "#Installing AWS CLI 2.0"
+apt install unzip -y
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/home/awscliv2.zip"
+cd /home
+unzip ./awscliv2.zip
+sudo ./aws/install
+
+echo "#Installing Docker and Docker-Compose"
 snap install docker
 sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 
-#clone Ghost project
+echo "#Clone Ghost project from GitHub"
 cd /home
 git clone https://github.com/sionsmith/docker-compose-ghost-quickstart.git
 #update the production config with the correct name to sort out the links in the menu
@@ -21,7 +32,11 @@ sed -i 's/CHANGE_FROM_EMAIL/${ses_email}/' docker-compose-ghost-quickstart/ghost
 cd docker-compose-ghost-quickstart
 docker-compose up --build -d
 
+echo "#Copying any themes from S3 to local content mount"
 #copy any themes from s3 into the volume mapping
 sleep 15
-aws s3 cp ${ghost_resources_bucket}/themes/ ./ghost/content/themes/ --recursive
-unzip "./ghost/content/themes/*.zip"
+/usr/local/bin/aws s3 cp s3://${ghost_resources_bucket}/themes/ ./ghost/content/themes/ --recursive
+#restart the ghost container
+docker restart ghost
+
+echo "#Create cron task for backup job"

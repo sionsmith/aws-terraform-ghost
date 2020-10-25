@@ -1,4 +1,36 @@
 # IAM Policies
+resource "aws_iam_policy" "ghost_s3_read_only" {
+  name   = "GHOST-S3-READ-ONLY"
+  path   = "/"
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "ListObjectsInBucketUploads",
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListBucket"
+            ],
+            "Resource": [
+                "arn:aws:s3:::${local.ghost_resources_bucket_name}"
+            ]
+        },
+        {
+            "Sid": "AllObjectActionsLookups",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:ListObjects"
+            ],
+            "Resource": [
+                "arn:aws:s3:::${local.ghost_resources_bucket_name}/*"
+            ]
+        }
+    ]
+}
+EOF
+}
 
 data "aws_iam_policy_document" "webserver_assume_role" {
   statement {
@@ -53,6 +85,11 @@ resource "aws_iam_instance_profile" "ghost_profile" {
 resource "aws_iam_role_policy_attachment" "webserver_attach_kms" {
   role       = aws_iam_role.webserver_role.name
   policy_arn = aws_iam_policy.webserver_kms.arn
+}
+
+resource "aws_iam_role_policy_attachment" "s3_read_only_access" {
+  role       = aws_iam_role.webserver_role.name
+  policy_arn = aws_iam_policy.ghost_s3_read_only.arn
 }
 
 resource "aws_iam_role_policy_attachment" "ssm-attach" {

@@ -6,7 +6,7 @@ exec > >(tee /var/log/user-data.log|logger -t user-data ) 2>&1
 
 #create environment variables used in cron tasks.
 echo "#Creating environment variables used in cron tasks"
-echp "S3_BACKUP_BUCKET=s3://`${ghost_resources_bucket}`" >> /etc/environment
+echo "S3_BACKUP_BUCKET=s3://`${ghost_resources_bucket}`" >> /etc/environment
 
 echo "#Installing AWS CLI 2.0"
 apt install unzip -y
@@ -35,8 +35,11 @@ docker-compose up --build -d
 echo "#Copying any themes from S3 to local content mount"
 #copy any themes from s3 into the volume mapping
 sleep 15
-/usr/local/bin/aws s3 cp s3://${ghost_resources_bucket}/themes/ ./ghost/content/themes/ --recursive
+/usr/local/bin/aws s3 sync s3://ghost-resources-eu-west-1-259100015265/themes/ ./ghost/content/themes/ --exact-timestamps --delete
 #restart the ghost container
 docker restart ghost
 
-echo "#Create cron task for backup job"
+echo "#Create cron task for backup job every night at 1 am"
+crontab<<EOF
+0 1 * * * /home/docker-compose-ghost-quickstart/scripts/db-backup.sh
+EOF
